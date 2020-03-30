@@ -20,13 +20,12 @@
 #   
 #   
 # }
-
 corr <- function(directory, threshold = 0){
   
-comp_cases <- complete(directory, id = 1:332)
-thresh_cases <- subset(comp_cases, nobs>threshold)
-cor_mon <- vector()
-
+  comp_cases <- complete(directory, id = 1:332)
+  thresh_cases <- subset(comp_cases, nobs>threshold)
+  cor_mon <- vector()
+  
   if (dim(thresh_cases)[1] == 0){
     cor_mon = 0
   } else {
@@ -39,5 +38,5 @@ cor_mon <- vector()
     } 
   }
 
-  cor_mon
+  return(cor_mon)
 }
