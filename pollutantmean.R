@@ -27,7 +27,7 @@ pollutantmean <- function(directory, pollutant, id = 1:332) {
   }
   
   pol_mean <- mean(comb_vec)
-  pol_mean
+  return(pol_mean)
 }
 
 
