@@ -14,14 +14,14 @@
 ## 5 12   96
 
 complete <- function(directory, id = 1:332){
-  
-  df_ret <- data.frame('id' = NULL, 'nobs' = NULL)
-  count <- 1
-  
-  for (i in id) {
-    
-    current_file <- (sprintf("%s/%03d.csv",directory,i))
-    df <- read.csv(current_file)
+      
+      df_ret <- data.frame('id' = NULL, 'nobs' = NULL)
+      count <- 1
+      
+      for (i in id) {
+            
+            current_file <- (sprintf("%s/%03d.csv",directory,i))
+            df <- read.csv(current_file)
     #Equivalent lines
     #df[complete.cases(df[1:731,]),]
     df_clean <-na.omit(df[,])

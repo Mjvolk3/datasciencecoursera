@@ -21,22 +21,22 @@
 #   
 # }
 corr <- function(directory, threshold = 0){
-  
+      
   comp_cases <- complete(directory, id = 1:332)
   thresh_cases <- subset(comp_cases, nobs>threshold)
   cor_mon <- vector()
   
   if (dim(thresh_cases)[1] == 0){
-    cor_mon = 0
+        cor_mon = 0
   } else {
-    for(i in 1:nrow(thresh_cases)) {
-      current_id <- thresh_cases['id'][i,1]
-      current_file <- (sprintf("%s/%03d.csv",directory,current_id))
-      df <- read.csv(current_file)
-      df_clean <-na.omit(df[,])
-      cor_mon <- c(cor_mon, cor(df_clean["sulfate"], df_clean["nitrate"]))
-    } 
+        for(i in 1:nrow(thresh_cases)) {
+              current_id <- thresh_cases['id'][i,1]
+              current_file <- (sprintf("%s/%03d.csv",directory,current_id))
+              df <- read.csv(current_file)
+              df_clean <-na.omit(df[,])
+              cor_mon <- c(cor_mon, cor(df_clean["sulfate"], df_clean["nitrate"]))
+        } 
   }
-
+  
   return(cor_mon)
 }
