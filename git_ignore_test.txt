@@ -1,1 +1,2 @@
 git ignore test
+adding a new line to see if commit notification registers
