@@ -3,3 +3,6 @@
 .RData
 .Ruserdata
 R_Programming/specdata/
+R_Programming/hospital-data.csv
+R_Programming/hw1_data/csv
+R_Programming/outcome-of-care-measures.csv
