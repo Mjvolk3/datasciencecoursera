@@ -1,0 +1,82 @@
+---
+title: "CHBE424_Quiz5"
+author: "Michael Volk"
+date: "April 24, 2020"
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    latex_engine: xelatex
+            
+header-includes: \usepackage[version=4]{mhchem} \usepackage{amsmath}
+---
+
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(echo = TRUE)
+```
+$\noindent\makebox[\linewidth]{\rule{\paperwidth}{.4pt}}$
+
+$\noindent\rule{16cm}{0.4pt}$
+
+*** 
+
+
+## Problem 1 (10 points)
+From mass transfer flux,
+
+$-W_{Ar} = k_{c}(C_{Ab} - C_{As})$
+
+From the surface reaction,
+
+$-r''_{AS} = k''(C_{AS} - C_{Ae})$
+
+At steady-state, $W_{Ar} = r''_{As}$
+
+Hence,
+
+$k_c(C_{Ab} = r''_{As})$
+
+$\Rightarrow k_{c}C_{Ab} + k''C_{Ae} = (k'' + k_{c}) C_{Ae}$
+
+$\Rightarrow C_{As} = \frac{k_{c}C_{Ab} + k''C_{Ae}}{k'' + k_{c}}$
+
+Hence, the overall rate is given as
+
+$-r''_{As} = k''(C_{As} - C_{Ae}) = k''\frac{k_{c}C_{Ab} + k''C_{Ae}}{k'' + k_{c}}-C_{Ae}$
+
+
+
+
+
+
+
+## R Markdown
+
+Here is an example of inserting latex code chunks:
+
+$a+b\underleftrightarrow{k} c + d$
+
+
+Here is an exmaple of importing mhchem Latex package and using it to produce the same equation. The mhchem Latex package is managed by miktex.
+
+$\ce{CO2 + C -> 2 CO}$
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

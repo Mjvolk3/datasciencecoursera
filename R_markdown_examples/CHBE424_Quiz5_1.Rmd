@@ -1,0 +1,158 @@
+---
+title: "Quiz 5 Solutions"
+author: "CHBE 424"
+date: "April 24, 2020"
+output:
+  pdf_document:
+    latex_engine: pdflatex
+header-includes: \usepackage[version=4]{mhchem} \usepackage{amsmath} \usepackage{mathtools} \usepackage{xcolor} \usepackage{nccmath}
+---
+
+```{r setup, include=FALSE} 
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$\noindent\rule{17cm}{0.4pt}$\
+
+1. (10 pts) Gaseous reactant A diffuses through a gas film and reacts on the surface of a solid according to a reversible firs-order rate,
+$-r''_{A} = k''(C_{As} - C_{Ae})$
+where $C_{Ae}$ is the concentration of A in equilibrium with the solid surface, and $C_{As}$ is the concentration of A on the solid surface. Develop and expression for the overall rate of reaction of A accounting for both the mass transfer and reaction steps in terms of $C_{Ab}$, $C_{Ae}$, $k''$, and $k_{c}$, where $C_{A}$ is the concentration of A in the bulk phase, and $k_{c}$ is the mass transfer coefficient.
+
+
+### **\textcolor{red}{Problem 1 Solution}**
+
+From mass transfer flux,
+
+$W_{Ar} = k_{c}(C_{Ab} - C_{As})$
+
+From the surface reaction,
+
+$-r''_{AS} = k''(C_{AS} - C_{Ae})$
+
+At steady-state, $W_{Ar} = -r''_{As}$
+
+Hence,$k_c(C_{Ab} = r''_{As})$
+
+$\Rightarrow k_{c}C_{Ab} + k''C_{Ae} = (k'' + k_{c}) C_{Ae}$
+
+$\Rightarrow C_{As} = \dfrac{k_{c}C_{Ab} + k''C_{Ae}}{k'' + k_{c}}$
+
+Hence, the overall rate is given as
+
+$-r''_{As} = k''(C_{As} - C_{Ae}) = k'' \left( \dfrac{k_{c}C_{Ab} + k''C_{Ae}}{k'' + k_{c}}-C_{Ae} \right)$
+
+$\boxed{-r''_{As} = \dfrac{k''k_{c}}{k'' + k_{c}}(C_{Ab} - C_{Ae})}$
+
+$\noindent\rule{17cm}{0.4pt}$
+
+2. (15 pts) The growth of germanium by chemical vapor deposition occurs according to the following series of reactions:
+
+$\hspace{210pt}$ $\underline{\text{Equilibrium Constant}}$
+
+$GeCl_{2(g)} + S \ce{<->[{k_{1}}]} GeCl_{2} \cdot S$ $\hspace{120pt}$ ${K_{1}}$
+
+$H_{2(g)} + 2S \ce{<->[{k_{1}}]} 2(H \cdot S)$ $\hspace{136pt}$ ${K_{2}}$
+
+$GeCl_{2} \cdot S + 2(H \cdot S) \ce{->[{k_{3}}]} Ge_{(s)} + 2HCL + 3S$
+
+The surface reaction is rate-limiting. Derive the rate expression for $Ge$ deposition in terms of partial pressures of $GeCl_{2}$ and $H_{2}$, specific rate constants, and the equilibrium constants.
+
+### **\textcolor{red}{Problem 2 Solution}**
+
+since the surface reaction is rate limiting,
+
+$r_{Ge} = k_3[GeCl_2 \cdot S][H \cdot S]^2$
+
+Assuming the other two reactions are at equilibrium,
+
+\begin{equation}\label{first_eq}
+      [GeCl_2 \cdot S] = K_1 P_{GeCl_2} \cdot C_v
+\end{equation}
+
+$[H {\cdot} S]^2 = K_2 P_{H_2} \cdot C_v^2$
+
+\begin{equation}\label{second_eq}
+      \Rightarrow H {\cdot} S = \sqrt{K_2 P_{H_2}} \cdot C_v 
+\end{equation}
+
+From the catalyst site blanace,
+
+$C_v + [H {\cdot} S] + [GeCl_2 {\cdot} S] = C_T$
+
+$\Rightarrow C_v + \sqrt{K_2 P_{H_2}} \cdot C_v + K_1 P_{GeCl_2} \cdot C_v = C_T$
+
+\begin{equation}\label{third_eq}
+      \Rightarrow C_v = \dfrac{C_T}{1+\sqrt{K_2 P_{H_2}} + K_1 P_{GeCl_2}}
+\end{equation}
+
+Plug in expressions from $(\ref{first_eq})$ and $(\ref{second_eq})$ into the rate equation,
+
+$r_{Ge} = k_3[GeCl_2 {\cdot} S][H {\cdot} S]^2 = k_3K_1K_2P_{GeCl_2}P_{H_2} \cdot C_v^3$
+
+Plug in $C_V$ from $(\ref{third_eq})$
+
+$\boxed{r_{Ge} = k_3K_1K_2P_{GeCl_2}P_{H_2}\left[\dfrac{C_T}{1 + K1 P_{GeCl_2} + \sqrt{K_2 P_{H_2}}}\right]^3}$
+
+$\noindent\rule{17cm}{0.4pt}$
+
+3. (25 pts) The zero-order reaction $A \rightarrow B$ is carried out in a moving bed reactor containing 1 kg of catalyst. The catalyst decay is also zero-order. The entering molar flow rate is pure A at 1 mol/min. Given the following information: (1) The product sells from \$160 per gram mole. (2) The cost of operating the bed is \$10 per kilograph of catalyst exiting the bed. (3) The specific reaction rate: $k_r$ = 1.0 mol/kg catalyst $\cdot$ min, and the decay consstant: $k_d$ 2.0 min$^-1$.
+
+(a) Write catalyst activity and conversion in terms of catalyst weight, respectively.
+(b) What is the feed rate of solids (kg/min) that will give the maximum profit?
+(c) What are the catalyst activity and conversion exiting the reactor at this optimum?
+
+*Hint*: For the purpose of this calculation, ignore all other costs, such as the cost of reactant, etc. Write the equation for the profit in terms of feed rate of solids and find the maximum profit analytically.
+
+### **\textcolor{red}{Problem 3 Solution}**
+
+(a) catalyst activity - $a$ follows zero-order rate law:
+
+$\dfrac{da}{dt} = -k_d; \hspace{5pt} dt = \dfrac{dw}{U_s} \Rightarrow \dfrac{da}{dw} = -\dfrac{k_d}{U_s}$
+
+
+
+\begin{multline*}
+      \int_{1}^2da = -\dfrac{k_d}{U_s} \int_{0}^w\\
+\end{multline*}
+
+\begin{fleqn}
+\begin{equation}
+\begin{alignedat}{2}
+      \int_{1}^2da = -\dfrac{k_d}{U_s} \int_{0}^w \nonumber
+\end{alignedat}
+\end{equation}
+\end{fleqn}
+
+
+
+
+
+
+
+
+
+
+\begin{alignat*}{2}
+      \int_{1}^2da = -\dfrac{k_d}{U_s} \int_{0}^w\\
+\end{alignat*}
+
+$\Rightarrow \boxed{a = 1 - \dfrac{k_d}{U_s} \cdot w}$
+
+Mole balance: $\dfrac{dX_A}{dw} = -\dfrac{-r'_A}{F_{A0}}$
+
+Rate law: $-r'_A = k_ra = (1 - \dfrac{K_d}{U_s}w)k_r$
+
+$\dfrac{dX_A}{dw} = \dfrac{k_r}{F_{A0} \left(1 - \dfrac{k_d w}{U_s}\right)}$
+
+Integrate: 
+
+$\frac{a}{b}$
+
+$\dfrac{a}{b}$
+
+$\cfrac{a}{b}$
+
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
