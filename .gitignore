@@ -9,3 +9,5 @@ Getting_and_Cleaning_Data/*.csv
 *.html
 *.jpg
 *.txt
+!Getting_and_Cleaning_Data/Project/README_original.txt
+!Getting_and_Cleaning_Data/Project/codebook.txt
