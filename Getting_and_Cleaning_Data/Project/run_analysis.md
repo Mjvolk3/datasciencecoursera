@@ -1,14 +1,14 @@
 Import Data
 -----------
 
-    activity_labels <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/activity_labels.txt")
-    features <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/features.txt")
-    train_X <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/train/X_train.txt")
-    train_y <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/train/y_train.txt")
-    train_subject <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/train/subject_train.txt")
-    test_X <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/test/X_test.txt")
-    test_y <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/test/y_test.txt")
-    test_subject <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/test/subject_test.txt")
+    activity_labels <- read.table("./UCI HAR Dataset/activity_labels.txt")
+    features <- read.table("./UCI HAR Dataset/features.txt")
+    train_X <- read.table("./UCI HAR Dataset/train/X_train.txt")
+    train_y <- read.table("C:./UCI HAR Dataset/train/y_train.txt")
+    train_subject <- read.table("./UCI HAR Dataset/train/subject_train.txt")
+    test_X <- read.table("C:./UCI HAR Dataset/test/X_test.txt")
+    test_y <- read.table("C:./UCI HAR Dataset/test/y_test.txt")
+    test_subject <- read.table("C:./UCI HAR Dataset/test/subject_test.txt")
 
 Define variable for subsetting
 ------------------------------

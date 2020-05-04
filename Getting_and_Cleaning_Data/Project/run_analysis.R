@@ -1,16 +1,17 @@
 #Project - Analysis.R
 
+library(dplyr)
 #read in data descriptors
-activity_labels <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/activity_labels.txt")
-features <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/features.txt")
+activity_labels <- read.table("./UCI HAR Dataset/activity_labels.txt")
+features <- read.table("./UCI HAR Dataset/features.txt")
 
 #read in all data and data labels
-train_X <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/train/X_train.txt")
-train_y <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/train/y_train.txt")
-train_subject <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/train/subject_train.txt")
-test_X <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/test/X_test.txt")
-test_y <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/test/y_test.txt")
-test_subject <- read.table("C:/Users/michaelvolk/Desktop/datasciencecoursera/R/Getting_and_Cleaning_Data/UCI HAR Dataset/test/subject_test.txt")
+train_X <- read.table("./UCI HAR Dataset/train/X_train.txt")
+train_y <- read.table("C:./UCI HAR Dataset/train/y_train.txt")
+train_subject <- read.table("./UCI HAR Dataset/train/subject_train.txt")
+test_X <- read.table("C:./UCI HAR Dataset/test/X_test.txt")
+test_y <- read.table("C:./UCI HAR Dataset/test/y_test.txt")
+test_subject <- read.table("C:./UCI HAR Dataset/test/subject_test.txt")
 
 #Keep only columns with mean and std, without selecting f(mean|std)
 column_subset <- grep("-[Mm]ean|-[Ss]td", features[[2]])
@@ -40,3 +41,4 @@ data_tidy2 <- data_tidy1 %>%
       summarize_all(mean) %>% 
       arrange(subject)
 
+write.table(data_tidy2, "./Project/data_tidy2.txt", row.name = FALSE)
