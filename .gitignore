@@ -2,8 +2,10 @@
 .Rhistory
 .RData
 .Ruserdata
+R_Programming/*.csv
 R_Programming/specdata
-R_Programming/hospital-data.csv
-R_Programming/hw1_data.csv
-R_Programming/outcome-of-care-measures.csv
 Sc_data.txt
+Getting_and_Cleaning_Data/*.csv
+*.html
+*.jpg
+*.txt
