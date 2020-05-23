@@ -1,0 +1,171 @@
+---
+title: "Impact_Journal_Count"
+author: "Michael Volk"
+date: "May 21, 2020"
+output:
+  html_document:
+    df_print: paged
+  pdf_document:
+    latex_engine: xelatex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(xlsx)
+library(scholar)
+library(dplyr)
+library(stringr)
+library(ggplot2)
+```
+## Import Author Information
+
+Import list of scholars. Some of the scolars do not have a Google Scholar page so their unique ID was mared as "NA." They are not considered in the analysis. If it is necessary to have their citation information we can count their citations manually.
+```{r, cache = TRUE}
+df <- readxl::read_xlsx("./PI_google_scholar_ids.xlsx")
+head(df, n = 3)
+print(dim(df)) #Rows, Columns
+```
+## Extract High Impact Journal Information
+
+Any journal with "Nature" in it's title is captured with `str_extract` and articles published in "Science" were captured with an exact character match. 
+```{r}
+pubs <- lapply(df$google_scholar_id, get_publications)
+
+impact_journal_count <- c()
+nature <- c()
+nature_sister <- c()
+science <- c()
+log_check <- c()
+for (i in 1:length(pubs)){
+      author <- pubs[[i]]
+      #nature count
+      nature_tot_count <- length(author$journal[as.logical(str_count(author$journal,"Nature"))])
+      nature_count <- length(author$journal[author$journal == "Nature"])
+      nature_sister_count <- nature_tot_count - nature_count
+      nature_log <- as.logical(str_count(author$journal,"Nature"))
+      #science count
+      science_count <- length(author$journal[author$journal == "Science"])
+      science_log <- author$journal == "Science"
+      
+      total_count <- nature_tot_count + science_count
+      total_log <- list(nature_log + science_log)
+      
+      impact_journal_count <- c(impact_journal_count,total_count)
+      log_check <- c(log_check,total_log)
+      nature <- c(nature,nature_count)
+      nature_sister <- c(nature_sister, nature_sister_count)
+      science <- c(science, science_count)
+}
+num_cites <- c()
+for (i in 1:nrow(df)){
+      if (df$google_scholar_id[i] != "NA"){
+            num_cites <- c(num_cites, get_profile(df$ google_scholar_id[i])$total_cites)
+      }
+      else {
+            num_cites <- c(num_cites, 0)
+      }
+}
+
+df_impact <- mutate(df, nature, nature_sister, science, impact_journal_count, num_cites)
+```
+
+## Missing Google Scholar Profiles
+
+For Authors without a Google Scholar profile the data was manually downloaded from the author profile page on *Web of Science*. Profile pages for Scott E. Denmark and Kenton McHenry exist but a profile page for Rachel Switzky could not be found. Scott E. Denmark has two search result hits, these were combined then downloaded. Kenton McHenry only has one one search result hit. This portion of the analysis is not completely reproducible as *Web of Science* requires log in credentials.
+
+```{r}
+# Denmark, Scott E.
+denmark <- read.table("Denmark_Scott_2020_05_22.txt", header = TRUE, sep = ",", skip = 2)
+denmark_nature_tot <- sum(as.logical(str_count(denmark$Source.Title, "NATURE")))
+df_impact$nature[3] <- sum(denmark$Source.Title == "NATURE")
+df_impact$nature_sister[3] <- denmark_nature_tot - df_impact$nature[3]
+df_impact$science[3] <- sum(denmark$Source.Title == "SCIENCE")
+df_impact$impact_journal_count[3] <- df_impact$nature[3] + df_impact$nature_sister[3] + df_impact$science[3]
+df_impact$num_cites[3] <- sum(denmark$Total.Citations)
+denmark_log <- as.logical(str_count(denmark$Source.Title, "NATURE") + as.integer(denmark$Source.Title == "SCIENCE"))
+
+# McHenry, Kenton 
+mchenry <- read.table("McHenry_Kenton_2020_05_22.txt", header = TRUE, sep = ",", skip = 2)
+mchenry_nature_tot <- sum(as.logical(str_count(mchenry$Source.Title, "NATURE")))
+df_impact$nature[10] <- sum(mchenry$Source.Title == "NATURE")
+df_impact$nature_sister[10] <- mchenry_nature_tot - df_impact$nature[10]
+df_impact$science[10] <- sum(mchenry$Source.Title == "SCIENCE")
+df_impact$impact_journal_count[10] <- df_impact$nature[10] + df_impact$nature_sister[10] + df_impact$science[10]
+df_impact$num_cites[10] <- sum(mchenry$Total.Citations)
+mchenry_log <- as.logical(str_count(mchenry$Source.Title, "NATURE") + as.integer(mchenry$Source.Title == "SCIENCE"))
+```
+
+## Team Totals
+
+Total number of publications from the team classified as: Nature publication, Nature Sister publication, Science publication
+
+```{r}
+publications_totals <- data.frame(sum(nature),sum(nature_sister), sum(science))
+names(publications_totals) <- c("Nature Publications","Nature Sister Journal Publications","Science Publications")
+knitr::kable(publications_totals, caption = "Team Publication Totals")
+```
+
+## Average Citation per Author
+
+The average number of citations per team member including the three team members without google scholar profiles.
+
+```{r}
+knitr::kable(mean(df_impact$num_cites), col.name = "Average", caption = "Average citation per team member")
+```
+
+## All Results
+
+Table of Results  
+  
+```{r}
+knitr::kable(df_impact)
+```
+```{r, include=FALSE}
+knitr::kable(select(df_impact, last_name, first_name, impact_journal_count, num_cites))
+```
+
+
+```{r, include = FALSE}
+#Plotted Results
+g <- ggplot(data = df_impact, aes(x = last_name, y = impact_journal_count)) + 
+      geom_bar(stat = "identity") +
+      ggtitle(label = "High Impact Publications",
+              subtitle = "Nature, Nature Sister, and Science") +
+      xlab("Author Last Name") +
+      ylab("Number of Publications") + 
+      theme(plot.title = element_text(hjust = 0.5),
+            plot.subtitle = element_text(hjust = 0.5),
+            axis.text.x = element_text(angle=45, hjust=1))
+      
+g
+```
+
+## Titles of Author's High Impact Publications
+
+The following are titles of the high impact papers (Nature, Nature Sister, and Science) published by each Author. Authors that did not have Google Scholar Profiles were omitted from this part of the analysis. 
+
+```{r, results = 'asis'}
+for (i in 1:nrow(df_impact)){
+      last_name <- df_impact$last_name[i]
+      author_col_name <- (sprintf("%s's High Impact Publications",last_name))
+      if (i != 3 & i != 10){
+            authors_pubs <- pubs[[i]]$title[as.logical(log_check[[i]])] 
+            print(i)
+      }
+      else if (i == 3){
+            #Scott E Denmark
+            authors_pubs <- denmark$Title[denmark_log]
+      }
+      else if (i == 10){
+            #Kenton McHenry
+            authors_pubs <- mchenry$Title[mchenry_log]
+      }
+      
+      print(knitr::kable(authors_pubs, col.names = "High Impact Publication Titles", 
+                   caption = author_col_name))
+      cat('\n')
+}
+```
+
+
+
