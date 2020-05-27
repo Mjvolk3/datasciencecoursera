@@ -1,0 +1,75 @@
+---
+title: "Final_Project needs a real title"
+author: "Michael Volk"
+date: "May 26, 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Synopsis
+
+_describe and summarize the analysis in at most 10 complete sentences_ 
+
+## Reading Documentation
+
+### Questions 1:
+
+Across the United States, which types of events are most harmful with respect to population health?
+
+Initial thoughts for exploration:
+
+- types of storms and direct fatality
+
+### Question 2:
+
+Across the United States, which types of events have the greatest economic consequences?
+
+## Data Processing
+
+Read in data
+
+```{r read_in_data, cache = TRUE}
+df <- read.csv("repdata_data_StormData.csv.bz2")
+```
+
+Table processing for figures
+
+```{r table_1, cache = TRUE}
+fatalities_months <- df %>% mutate(MONTHS = fct_explicit_na(months(as.Date(df$BGN_DATE, "%m/%d/%y")))) %>%
+      group_by(EVTYPE, MONTHS) %>%
+      summarize(FATALITIES_sum = sum(FATALITIES)) %>%
+      arrange(desc(FATALITIES_sum)) %>% 
+      ungroup()
+```
+## Results
+
+```{r figure_1}
+n_obs <- 100
+fatalities_months_short <- fatalities_months[1:n_obs,]
+#reordering factors - Months: chronologically, Event types: Months with highest fatality totals
+fatalities_months_short$MONTHS <- factor(fatalities_months_short$MONTHS, levels = month.name)
+fatalities_months_short$EVTYPE <- factor(fatalities_months_short$EVTYPE, levels = unique(fatalities_months_short$EVTYPE))
+
+g1 <- ggplot(fatalities_months_short, aes(EVTYPE, FATALITIES_sum)) + 
+      geom_point(aes(color = MONTHS), size = 4, alpha = 0.3) + 
+      theme(axis.text.x = element_text(angle = 45, hjust=1), plot.title = element_text(hjust = 0.5)) +
+      scale_y_continuous(trans = "log10") +
+      labs(title = "Storm Event Fatalities by Month", x = "Event Type", y = expression(Total~Fatalities~(log[10]~scale)))
+```
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
