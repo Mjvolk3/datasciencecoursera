@@ -1,5 +1,5 @@
 ---
-title: "Final_Project needs a real title"
+title: "Harmful Storm Events - Highlighting Harmful Events to Health and Economy"
 author: "Michael Volk"
 date: "May 26, 2020"
 output: html_document
@@ -8,25 +8,40 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
 ## Synopsis
 
-_describe and summarize the analysis in at most 10 complete sentences_ 
+Using data published by the NOASS Storm Database over 2019 and 2020 we attempt to highlight the most dangerous storm types in terms of both human health and damage. As weather patterns are seasonal we highlight changes across different seasons to allow for proper seasonal planning. 
 
-## Reading Documentation
+## Questions
 
-### Questions 1:
+### Question 1:
 
 Across the United States, which types of events are most harmful with respect to population health?
-
-Initial thoughts for exploration:
-
-- types of storms and direct fatality
 
 ### Question 2:
 
 Across the United States, which types of events have the greatest economic consequences?
 
 ## Data Processing
+
+Necessary packages 
+```{r message = FALSE, warning=FALSE}
+library(tidyverse)
+library(lubridate)
+library(forcats)
+library(scales)
+library(gridExtra)
+```
+
+
+OS information
+
+R.Version()[c("platform", "version.string")]
+
+```{r system_information}
+R.Version()[c("platform", "version.string")]
+```
 
 Read in data
 
@@ -36,40 +51,149 @@ df <- read.csv("repdata_data_StormData.csv.bz2")
 
 Table processing for figures
 
-```{r table_1, cache = TRUE}
-fatalities_months <- df %>% mutate(MONTHS = fct_explicit_na(months(as.Date(df$BGN_DATE, "%m/%d/%y")))) %>%
-      group_by(EVTYPE, MONTHS) %>%
-      summarize(FATALITIES_sum = sum(FATALITIES)) %>%
-      arrange(desc(FATALITIES_sum)) %>% 
-      ungroup()
+We know that storms are seasonal, so we look to find if there are is a particular type of storm responsible for the most fatalities or injuries during a specific month.
+
+```{r Table_1.1}
+most_health <- df %>% group_by(EVTYPE) %>% 
+      summarize(fatalities_injuries = sum(FATALITIES) + sum(INJURIES)) %>% 
+      arrange(desc(fatalities_injuries))
+knitr::kable(head(most_health, n = 5), caption = "Table 3.1: Combined Fatality and Injury Totals")
 ```
+
+```{r Table_1.2}
+most_damage <- df %>% group_by(EVTYPE) %>% 
+      summarize(crop_prop = sum(CROPDMG) + sum(PROPDMG)) %>% 
+      arrange(desc(crop_prop))
+knitr::kable(head(most_damage, n = 5), caption = "Table 3.2: Combined Crop and Property Damage Totals")
+```
+
+```{r Table_2, cache = TRUE}
+health_months <- df %>% mutate(MONTHS = fct_explicit_na(months(as.Date(df$BGN_DATE, "%m/%d/%y")))) %>%
+    group_by(EVTYPE, MONTHS) %>%
+    summarize(fatalities.sum = sum(FATALITIES), injuries.sum = sum(INJURIES)) %>% 
+      arrange(desc(fatalities.sum + injuries.sum))
+knitr::kable(head(health_months, n=10), caption = "Table 1: Storm Events and Health Risk by Month")
+```
+
+We also look to see if there is a particular storm type responsible for the economic damage. We again group these by month to see if there are any seasonal trends.
+
+```{r Table_3, cache = TRUE}
+damage_months <- df %>% mutate(MONTHS = fct_explicit_na(months(as.Date(df$BGN_DATE, "%m/%d/%y")))) %>% 
+      group_by(EVTYPE, MONTHS) %>%
+      summarize(crop.damage = sum(CROPDMG), property.damage = sum(PROPDMG)) %>%
+      arrange(desc(crop.damage + property.damage))
+knitr::kable(head(damage_months, n=10), caption = "Table 2: Storm Events and Economic Damage by Month")
+```
+
 ## Results
 
-```{r figure_1}
-n_obs <- 100
-fatalities_months_short <- fatalities_months[1:n_obs,]
-#reordering factors - Months: chronologically, Event types: Months with highest fatality totals
-fatalities_months_short$MONTHS <- factor(fatalities_months_short$MONTHS, levels = month.name)
-fatalities_months_short$EVTYPE <- factor(fatalities_months_short$EVTYPE, levels = unique(fatalities_months_short$EVTYPE))
+### Totals of Health Risks and Damages
 
-g1 <- ggplot(fatalities_months_short, aes(EVTYPE, FATALITIES_sum)) + 
+```{r Figure_1, fig.align='center', fig.cap="Figure 1", fig.asp=(9/16), fig.width=10}
+top <- 20
+most_health_sm <-  most_health[1:top,]
+most_health_sm$EVTYPE <- factor(most_health_sm$EVTYPE, levels = most_health_sm$EVTYPE)
+
+g3_1 <- most_health_sm %>% ggplot(aes(x=EVTYPE, y=fatalities_injuries)) + 
+      geom_bar(stat = "identity") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_y_log10("Fatalities and Injuries",
+              breaks = trans_breaks("log10", function(x) 10^x),
+              labels = trans_format("log10", math_format(10^.x))) +
+      labs(title = "Storm Events that Pose the Largest Health Risk",
+           x = "Event Type")
+
+most_damage_sm <-  most_damage[1:top,]
+most_damage_sm$EVTYPE <- factor(most_damage_sm$EVTYPE, levels = most_damage_sm$EVTYPE)
+
+g3_2 <- most_damage_sm %>% ggplot(aes(x=EVTYPE, y=crop_prop)) + 
+      geom_bar(stat = "identity") +
+      theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      scale_y_log10("Property and Crop Damage $",
+              breaks = trans_breaks("log10", function(x) 10^x),
+              labels = trans_format("log10", math_format(10^.x))) +
+      labs(x = "Event Type", 
+           title = "Storm Events that Cause the Most Damage")
+
+grid.arrange(g3_1,g3_2,nrow=2)
+```
+
+### Question 1
+
+We plot storm fatalities and injuries by storm type and color categorized by month to pick out major trends. 
+
+```{r Figure_2, fig.align='center', fig.cap="Figure 2", fig.asp=(9/16), fig.width=10}
+percent <- 4
+health_months_gat <- health_months %>% ungroup() %>%
+      mutate(ID = row_number(EVTYPE)) %>% 
+      gather(key = health_risk, value = totals, fatalities.sum:injuries.sum)
+n_obs_health <-floor(dim(health_months_gat)[[1]] * percent/100)
+health_months_gat <- health_months_gat %>% arrange(desc(totals))
+health_months_gat$health_risk <- factor(health_months_gat$health_risk)
+health_months_gat_sm <- health_months_gat[1:n_obs_health,]
+# Correcting Factors for cleaner plot
+health_months_gat_sm$MONTHS <- fct_explicit_na(factor(health_months_gat_sm$MONTHS, levels = month.name))
+
+Title <- paste(paste0((sprintf("The Top %s",percent)), "%"), "by Total of Storm Event Injuries/Fatalities")
+g1 <- ggplot(health_months_gat_sm, aes(EVTYPE, totals)) + 
       geom_point(aes(color = MONTHS), size = 4, alpha = 0.3) + 
       theme(axis.text.x = element_text(angle = 45, hjust=1), plot.title = element_text(hjust = 0.5)) +
       scale_y_continuous(trans = "log10") +
-      labs(title = "Storm Event Fatalities by Month", x = "Event Type", y = expression(Total~Fatalities~(log[10]~scale)))
+      labs(title = Title, x = "Event Type", y = expression(Total~Dollars~(log[10]~scale))) +
+      facet_grid(health_risk~.)
+g1
 ```
 
+### Discussion: Figure 2
 
+**TORNADOS**
 
-```{r}
+TORNADOS pose the largest threat to health as they account for the largest number of both deaths and fatalities. Most of the deaths/fatalities from TORNADOS occur during Spring months, namely March, April, and May. 
 
+**FLOODS**
 
+FLOODS pose a large threat to health. Most of the FLOODS take place in October when there is typically increasing rainfall.
+
+**EXCESSIVE HEAT**
+
+EXCESSIVE HEAT pose a large threat to health. As expected, most of the deaths/fatalties from EXCESSIVE HEAT takes place during Summer months, namely June, July, and August.
+
+**Other Storms**
+
+By focusing on columns of Figure 1 with a large number of different colored dots we find that there are many storm events that have a near annual effect such as THUNDERSTORM WIND, FLASH FLOODS, and TSTM WIND. 
+
+### Question 2
+
+```{r Figure_3, fig.align = 'center', fig.cap="Figure 3", fig.asp = (9/16), fig.width =10}
+percent <- 5
+damage_months_gat <- damage_months %>% ungroup() %>%
+      mutate(ID = row_number(EVTYPE)) %>% 
+      gather(key = economic_damage, value = totals, crop.damage:property.damage)
+n_obs_damage <-floor(dim(damage_months_gat)[[1]] * percent/100)
+damage_months_gat <- damage_months_gat %>% arrange(desc(totals))
+damage_months_gat$health_risk <- factor(damage_months_gat$economic_damage)
+damage_months_gat_sm <- damage_months_gat[1:n_obs_damage,]
+# Correcting Factors for cleaner plot
+damage_months_gat_sm$MONTHS <- fct_explicit_na(factor(damage_months_gat_sm$MONTHS, levels = month.name))
+
+Title <- paste(paste0((sprintf("The Top %s",percent)), "%"), "by Total Dollars of Storm Related Crop/Property Damage")
+g2 <- ggplot(damage_months_gat_sm, aes(EVTYPE, totals)) + 
+      geom_point(aes(color = MONTHS), size = 4, alpha = 0.3) + 
+      theme(axis.text.x = element_text(angle = 45, hjust=1), plot.title = element_text(hjust = 0.5)) +
+      scale_y_log10("y",
+                    breaks = trans_breaks("log10", function(x) 10^x),
+                    labels = trans_format("log10", math_format(10^.x))) +
+      labs(title = Title, x = "Event Type", y = expression(Total~Dollars~(log[10]~scale))) +
+      facet_grid(economic_damage~.)
+g2
 ```
 
+### Discussion: Figure 3
 
+**TORNDADOS**
 
+As we might expect from Figure 1 the damage caused by TORNADOS is substantial. TORNADOS cause the most combined property damage and crop damage for any given month.
 
+**HAIL**
 
-
-
-
+HAIL Causes a great deal of crop damage, and most of this damage occurs during the Summer months. In fact the most amount of crop damage occurs in June from HAIL.
